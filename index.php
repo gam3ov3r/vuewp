@@ -101,8 +101,8 @@
         mode: 'history',
         routes: [
             { path: '/', name: 'home', template: '<div>Hi Roy.</div>' },
-            { path: '/vue/posts', name: 'posts', component: posts },
-            { path: '/vue/posts/:id', name: 'post', component: post },
+            { path: '/posts', name: 'posts', component: posts },
+            { path: '/posts/:id', name: 'post', component: post },
         ]
     });
 
