@@ -3,6 +3,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'vue-router', get_template_directory_uri() . '/assets/js/vue-router.js', [ 'vuejs' ] );
 	wp_enqueue_script( 'vuejs', get_template_directory_uri() . '/assets/js/vue.js' );
+	wp_enqueue_script( 'moment', get_template_directory_uri() . '/assets/js/moment.js' );
 } );
 
 add_action( 'init', function () {

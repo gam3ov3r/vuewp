@@ -1,10 +1,10 @@
 <?php get_header(); ?>
-<div id="app">
-    <nav>
-	    Current route name: {{ $route.name }}
-        <router-link to="/">Home</router-link>
-        <router-link to="/posts">Posts</router-link>
-    </nav>
+<div id="app" class="container">
+	<h1>Current route name: {{ $route.name }}</h1>
+	<ul class="nav">
+	  <li class="nav-item"><router-link to="/">Home</router-link></li>
+	  <li class="nav-item"><router-link to="/posts">Posts</router-link></li>
+	</ul>    
     <div id="wrapper">
     <router-view></router-view>
     <post-list></post-list>
@@ -12,47 +12,43 @@
 </div>
 
 <script type="text/html" id="post-list-tmpl">
-    <div id="posts">
-        <div v-for="post in posts">
-            <article v-bind:id="'post-' + post.id">
-                <header>
-                    <h2 class="post-title">
-                        {{post.title.rendered}}
-                    </h2>
-                </header>
-                <div class="entry-content" v-html="post.excerpt.rendered"></div>
-                <router-link :to="{ name: 'post', params: { id: post.id }}">
-                    Read More
-                </router-link>
-            </article>
-        </div>
-    </div>
+	<div class="list-group">
+		<router-link :to="{ name: 'post', params: { id: post.id }}" class="list-group-item list-group-item-action flex-column align-items-start" v-bind:id="'post-' + post.id" v-for="post in posts">
+			<div class="d-flex w-100 justify-content-between">
+				<h5 class="mb-1">{{post.title.rendered}}</h5>
+				<small class="text-muted">{{post.date | formatDate}}</small>
+			</div>
+			<p class="mb-1" v-html="post.excerpt.rendered">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+		</router-link>
+	</div>    
 </script>
 <script type="text/html" id="post-tmpl">
-    <div class="post">
- 
-        <article v-bind:id="'post-' + post.id">
-            <header>
-                <h2 class="post-title">
-                    {{post.title}}
-                </h2>
-            </header>
-            <div class="entry-content" v-html="post.content"></div>
- 
-        </article>
-    </div>
-</script>
-
-<script>
 	
+	<div class="card border-primary mb-3">	
+		<div class="card-body" v-bind:id="'post-' + post.id">
+			<h5 class="card-title">{{post.title}}</h5>
+			<h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+			<p class="card-text" v-html="post.content"></p>
+		</div>
+	</div>
+    
+</script>
+<script>
 (function($){
+
+Vue.filter('formatDate', function(value) {
+  if (value) {
+    return moment(String(value), 'YYYYMMDD').fromNow()
+    
+  }
+});
     var config = {
         api: {
             posts: "<?php echo esc_url_raw( rest_url( 'wp/v2/posts/' ) ); ?>"
         },
         nonce: "<?php echo wp_create_nonce( 'wp_rest' ); ?>"
     };
-
+    
     var posts = Vue.component('post-list', {
         template: '#post-list-tmpl',
         data: function() {
