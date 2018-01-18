@@ -2,8 +2,8 @@
 <div id="app">
     <nav>
 	    Current route name: {{ $route.name }}
-        <router-link to="/vue">Home</router-link>
-        <router-link to="/vue/posts">Posts</router-link>
+        <router-link to="/">Home</router-link>
+        <router-link to="/posts">Posts</router-link>
     </nav>
     <div id="wrapper">
     <router-view></router-view>
