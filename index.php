@@ -1,19 +1,31 @@
 <?php get_header(); ?>
 <div id="app" class="container">
-	<h1>Current route name: {{ $route.name }}</h1>
-	<ul class="nav">
-	  <li class="nav-item"><router-link to="/">Home</router-link></li>
-	  <li class="nav-item"><router-link to="/posts">Posts</router-link></li>
-	</ul>    
     <div id="wrapper">
-    <router-view></router-view>
-    <post-list></post-list>
+		<nav-list></nav-list>
+		<router-view :key="$route.fullPath"></router-view>
+	    <post-list></post-list>
     </div>
 </div>
-
+<script type="text/html" id="nav-list-tmpl">
+	<ul class="nav nav-pills">
+		<li class="nav-item">
+			<router-link to="/" class="nav-link">Home</router-link>
+		</li>   
+	</ul>
+</script>
+<script type="text/html" id="post-tmpl">        
+	<div class="card border-primary mb-3">	
+		<div class="card-body" v-bind:id="'post-' + post.id">
+			<h5 class="card-title">{{post.title}}</h5>
+			<h6 class="card-subtitle mb-2 text-muted">Posted {{post.date | formatDate}}</h6>
+			<p class="card-text" v-html="post.content"></p>
+			<small class="text-muted">{{ $route.name }}</small>
+		</div>
+	</div>
+</script>
 <script type="text/html" id="post-list-tmpl">
 	<div class="list-group">
-		<router-link :to="{ name: 'post', params: { id: post.id }}" class="list-group-item list-group-item-action flex-column align-items-start" v-bind:id="'post-' + post.id" v-for="post in posts">
+		<router-link :to="{ name: 'post', params: { id: post.id }}" v-bind:id="'post-' + post.id" v-for="post in posts" active-class="active" class="list-group-item list-group-item-action flex-column align-items-start">
 			<div class="d-flex w-100 justify-content-between">
 				<h5 class="mb-1">{{post.title.rendered}}</h5>
 				<small class="text-muted">{{post.date | formatDate}}</small>
@@ -22,33 +34,31 @@
 		</router-link>
 	</div>    
 </script>
-<script type="text/html" id="post-tmpl">
-	
-	<div class="card border-primary mb-3">	
-		<div class="card-body" v-bind:id="'post-' + post.id">
-			<h5 class="card-title">{{post.title}}</h5>
-			<h6 class="card-subtitle mb-2 text-muted">Posted {{post.date | formatDate}}</h6>
-			<p class="card-text" v-html="post.content"></p>
-		</div>
-	</div>
-    
-</script>
+
 <script>
 (function($){
-
-Vue.filter('formatDate', function(value) {
-  if (value) {
-    return moment(String(value), 'YYYYMMDD').fromNow()
-    
-  }
-});
+	// Make dates pretty
+	Vue.filter('formatDate', function(value) {
+	  if (value) {
+	    return moment(String(value), 'YYYYMMDD').fromNow()
+	    
+	  }
+	});
+	
+	// Config the API	
     var config = {
         api: {
             posts: "<?php echo esc_url_raw( rest_url( 'wp/v2/posts/' ) ); ?>"
         },
         nonce: "<?php echo wp_create_nonce( 'wp_rest' ); ?>"
     };
-    
+
+	// List navigation
+    var posts = Vue.component('nav-list', {
+        template: '#nav-list-tmpl'
+    });
+	
+	// List all posts
     var posts = Vue.component('post-list', {
         template: '#post-list-tmpl',
         data: function() {
@@ -69,7 +79,8 @@ Vue.filter('formatDate', function(value) {
             },
         }
     });
-
+	
+	// View selected post
 	var post = Vue.component( 'post', {
 	    template: '#post-tmpl',
 	    data: function() {
@@ -91,8 +102,8 @@ Vue.filter('formatDate', function(value) {
 	        }
 	    }
 	});
-
-
+	
+	// History settings
     var router = new VueRouter({
         mode: 'history',
         routes: [
@@ -101,8 +112,8 @@ Vue.filter('formatDate', function(value) {
             { path: '/posts/:id', name: 'post', component: post },
         ]
     });
-
-
+    
+	// Lets go
     new Vue({
         router,
     }).$mount('#app')
